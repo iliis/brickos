@@ -14,7 +14,7 @@ KSOURCES=$(KSOURCES1:%=kernel/%)
 KASMSOURCES1=dccasm.S
 KASMSOURCES=$(KASMSOURCES1:%=kernel/%)
 
-KERNEL_TARGETS:=$(KERNEL).coff $(KERNEL).srec $(KERNEL).lds BaseAddresses
+KERNEL_TARGETS:=$(KERNEL).coff $(KERNEL).srec $(KERNEL).lds
 
 # Files of the source distribution
 DISTFILES += kernel/Makefile.sub $(KSOURCES) $(KASMSOURCES)
@@ -25,7 +25,7 @@ DISTFILES += kernel/Makefile.sub $(KSOURCES) $(KASMSOURCES)
 # This will not work on Windows unless you have perl installed.
 #
 #all: $(KERNEL).srec $(KERNEL).dis2 $(KERNEL).lds
-all:: $(KERNEL_TARGETS)
+all:: $(KERNEL_TARGETS) BaseAddresses
 
 install:: $(KERNEL_TARGETS)
 	test -d $(DESTDIR)$(pkgdatadir) || mkdir -p $(DESTDIR)$(pkgdatadir)
