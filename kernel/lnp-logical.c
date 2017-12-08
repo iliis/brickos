@@ -74,7 +74,7 @@ volatile unsigned char lnp_tx_echoes = CONF_LNP_TX_ECHOES;
 /* We use only low 16 bit of sys_time, which is safe */
 extern volatile time_t sys_time;
 
-static const unsigned char *tx_ptr; //!< ptr to next byte to transmit
+__attribute__((used)) static const unsigned char *tx_ptr; //!< ptr to next byte to transmit
 static const unsigned char *tx_verify;  //!< ptr to next byte to verify
 static const unsigned char *tx_end; //!< ptr to byte after last
 
