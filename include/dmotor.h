@@ -132,7 +132,7 @@ extern void motor_c_dir(MotorDirection dir);	//!< set motor C direction to dir
 //! set motor A direction
 /*! \param dir the direction
  */
-extern inline void motor_a_dir(MotorDirection dir)
+static inline void motor_a_dir(MotorDirection dir)
 {
   dm_a.dir = dir << MOTOR_A_SHIFT;
 }
@@ -140,7 +140,7 @@ extern inline void motor_a_dir(MotorDirection dir)
 //! set motor B direction
 /*! \param dir the direction
  */
-extern inline void motor_b_dir(MotorDirection dir)
+static inline void motor_b_dir(MotorDirection dir)
 {
   dm_b.dir = dir << MOTOR_B_SHIFT;
 }
@@ -148,7 +148,7 @@ extern inline void motor_b_dir(MotorDirection dir)
 //! set motor C direction
 /*! \param dir the direction
  */
-extern inline void motor_c_dir(MotorDirection dir)
+static inline void motor_c_dir(MotorDirection dir)
 {
   dm_c.dir = dir << MOTOR_C_SHIFT;
 }
@@ -159,7 +159,7 @@ extern inline void motor_c_dir(MotorDirection dir)
 //! set motor A speed
 /*! \param speed the speed
  */
-extern inline void motor_a_speed(unsigned char speed)
+static inline void motor_a_speed(unsigned char speed)
 {
   dm_a.access.c.delta = speed;
 }
@@ -167,7 +167,7 @@ extern inline void motor_a_speed(unsigned char speed)
 //! set motor B speed
 /*! \param speed the speed
  */
-extern inline void motor_b_speed(unsigned char speed)
+static inline void motor_b_speed(unsigned char speed)
 {
   dm_b.access.c.delta = speed;
 }
@@ -175,7 +175,7 @@ extern inline void motor_b_speed(unsigned char speed)
 //! set motor C speed
 /*! \param speed the speed
  */
-extern inline void motor_c_speed(unsigned char speed)
+static inline void motor_c_speed(unsigned char speed)
 {
   dm_c.access.c.delta = speed;
 }

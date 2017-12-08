@@ -164,7 +164,7 @@ extern volatile int ds_muxs[3][3];	//!< mux ch values
 //! set sensor mode to active (light sensor emits light, rotation works)
 /*! \param  sensor: &SENSOR_1,&SENSOR_2,&SENSOR_3
 */
-extern inline void ds_active(volatile unsigned *sensor)
+static inline void ds_active(volatile unsigned *sensor)
 {
   if (sensor == &SENSOR_3)
     bit_set(&ds_sensorbits, 0);
@@ -177,7 +177,7 @@ extern inline void ds_active(volatile unsigned *sensor)
 //! set sensor mode to passive (light sensor detects ambient light)
 /*! \param  sensor: &SENSOR_1,&SENSOR_2,&SENSOR_3
 */
-extern inline void ds_passive(volatile unsigned *sensor)
+static inline void ds_passive(volatile unsigned *sensor)
 {
   if (sensor == &SENSOR_3) {
     bit_clear(&ds_sensorbits, 0);
@@ -207,7 +207,7 @@ extern void ds_rotation_set(volatile unsigned *sensor, int pos);
 //! start tracking rotation sensor
 /*! \param  sensor: &SENSOR_1,&SENSOR_2,&SENSOR_3
 */
-extern inline void ds_rotation_on(volatile unsigned *sensor)
+static inline void ds_rotation_on(volatile unsigned *sensor)
 {
     if (sensor == &SENSOR_3) {
 	bit_set(&ds_rotation, 0);
@@ -224,7 +224,7 @@ extern inline void ds_rotation_on(volatile unsigned *sensor)
 //! stop tracking rotation sensor
 /*! \param  sensor: &SENSOR_1,&SENSOR_2,&SENSOR_3
 */
-extern inline void ds_rotation_off(volatile unsigned *sensor)
+static inline void ds_rotation_off(volatile unsigned *sensor)
 {
     if (sensor == &SENSOR_3) {
 	bit_clear(&ds_rotation, 0);
@@ -266,7 +266,7 @@ extern void ds_mux_on(volatile unsigned *sensor,
 //! stop multiplexing
 /*! \param  sensor: &SENSOR_1,&SENSOR_2,&SENSOR_3
 */
-extern inline void ds_mux_off(volatile unsigned *sensor)
+static inline void ds_mux_off(volatile unsigned *sensor)
 {
   if (sensor == &SENSOR_3)
     bit_clear(&ds_mux, 0);

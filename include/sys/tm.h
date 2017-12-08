@@ -157,7 +157,7 @@ extern void tm_switch_handlers(void);
 /**
  * Release the kernel lock.
  */
-extern inline void release_kernel_lock() {
+static inline void release_kernel_lock() {
     /* Order is very important.  GCC doesn't optimize
      * it away since kernel_lock is volatile.
      */

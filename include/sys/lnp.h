@@ -109,7 +109,7 @@ extern void lnp_integrity_reset(void);
 //! return whether a packet is currently being received
 /*! \return 1 if yes, else zero
 */
-extern inline int lnp_integrity_active(void) {
+static inline int lnp_integrity_active(void) {
   return lnp_integrity_state!=LNPwaitHeader;
 }
 

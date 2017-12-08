@@ -106,7 +106,7 @@ static sem_t tx_sem;                //!< transmitter access semaphore
 ///////////////////////////////////////////////////////////////////////////////
 
 //! disable IR carrier frequency.
-extern inline void carrier_shutdown(void) {
+static inline void carrier_shutdown(void) {
   T1_CR  =0;
   T1_CSR =0;
 }
