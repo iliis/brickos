@@ -41,6 +41,7 @@ TOOL_PATH="/usr/local/bin
 #   known PREFIXs of h8*gcc
 TOOL_PREFIX="h8300-hms-
              h8300hms-
+             h8300-linux-gnu-
              h8300-hitachi-hms-
              h8300-hitachi-coff-"
 
