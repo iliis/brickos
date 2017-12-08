@@ -1,6 +1,8 @@
 *.a
 *.d
 *.lx
+*.o
+*.elf
 
 Makefile.config
 kernel/bibo.coff
