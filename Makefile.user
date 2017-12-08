@@ -37,7 +37,7 @@ LIBDIR?=lib
 #  Set DYNAMIC_TEXT, DOBJECTS, DYNAMIC_LDS appropriately.
 
 %.dcoff: %.o %.a $(DYNAMIC_LDS)
-	$(CROSSLD) $(DLDFLAGS) $*.o $*.a $(CROSSLIBS) -o $@ -Ttext $(call GET_BASE,BASE1) --oformat coff-h8300
+	$(CROSSLD) $(DLDFLAGS) $*.o $*.a $(CROSSLIBS) -o $@ -Ttext $(call GET_BASE,BASE1) --oformat elf32-h8300
 
 #  How to make barebones dymanic executable map files
 %.dmap: %.dcoff
@@ -92,17 +92,17 @@ LIBDIR?=lib
 
 #  How to make coff files of dynamic executables (twice, for makelx)
 %.dc1: %.o %.a $(CROSSLIBS:-l%=$(LIBDIR)/lib%.a) $(KERNEL).lds
-	$(CROSSLD) $(DLDFLAGS) $*.o $*.a $(CROSSLIBS) -o $@ --oformat coff-h8300 -Ttext $(call GET_BASE,BASE1)
+	$(CROSSLD) $(DLDFLAGS) $*.o $*.a $(CROSSLIBS) -o $@ --oformat elf32-h8300 -Ttext $(call GET_BASE,BASE1)
 
 %.dc2: %.o %.a $(CROSSLIBS:-l%=$(LIBDIR)/lib%.a) $(KERNEL).lds
-	$(CROSSLD) $(DLDFLAGS) $*.o $*.a $(CROSSLIBS) -o $@ --oformat coff-h8300 -Ttext $(call GET_BASE,BASE2)
+	$(CROSSLD) $(DLDFLAGS) $*.o $*.a $(CROSSLIBS) -o $@ --oformat elf32-h8300 -Ttext $(call GET_BASE,BASE2)
 
 #  How to make srec files from coff files (twice, for makelx)
 %.ds2: %.dc2
-	$(CROSSOBJCOPY) -I coff-h8300 -O symbolsrec $< $@
+	$(CROSSOBJCOPY) -I elf32-h8300 -O symbolsrec $< $@
 
 %.ds1: %.dc1
-	$(CROSSOBJCOPY) -I coff-h8300 -O symbolsrec $< $@
+	$(CROSSOBJCOPY) -I elf32-h8300 -O symbolsrec $< $@
 
 %.lx: %.ds1 %.ds2 $(MAKELX)
 	$(MAKELX) $*.ds1 $*.ds2 $@

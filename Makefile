@@ -251,6 +251,6 @@ $(NATIVEOBJS): %.o: %.c
 
 # how to build srec from coff (for download)
 %.srec: %.coff
-	$(CROSSOBJCOPY) -I coff-h8300 -O srec $*.coff $*.srec
+	$(CROSSOBJCOPY) -I elf32-h8300 -O srec $*.coff $*.srec
 
 include Makefile.user

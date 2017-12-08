@@ -6,7 +6,7 @@
  * 
  */
 
-OUTPUT_FORMAT("coff-h8300")
+OUTPUT_FORMAT("elf32-h8300")
 OUTPUT_ARCH(h8300)
 ENTRY("_kmain")
 
