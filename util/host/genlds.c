@@ -172,9 +172,9 @@ static void print_footer(FILE *f) {
   .text BLOCK(2) :  {\n\
     ___text = . ;\n\
     *(.text)          /* must start with text for clean entry */            \n\
-    *(.text.startup)\n\
+    *(.text.*)\n\
     *(.rodata)\n\
-    *(.rodata.str1.1)\n\
+    *(.rodata.*)\n\
     *(.strings)\n\
     *(.vectors)       /* vectors region (dummy) */\n\
     *(.persist)\n\

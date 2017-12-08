@@ -59,9 +59,9 @@ SECTIONS {
     ___text = . ;
     *(.text.ma)       /* must start with text.ma for clean entry */
     *(.text) 	 
-    *(.text.startup)
+    *(.text.*)
     *(.rodata)
-    *(.rodata.str1.1)
+    *(.rodata.*)
     *(.strings)
     *(.vectors)       /* vectors region (dummy) */
     ___text_end = . ;
