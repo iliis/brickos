@@ -45,8 +45,8 @@ TAGS:
 	-etags *.c $(DATADIR)/include/*.h ../include/*/*.h 
 
 clean::
-	rm -f *.o *.dis *.dis2 *.s *.ds1 *.ds2 *.dmap *.dcoff 
-	rm -f *.srec *.coff
+	rm -f *.o *.dis *.dis2 *.s *.ds1 *.ds2 *.dmap *.dcoff  *.dcoff
+	rm -f *.srec *.coff *.elf
 
 realclean:: clean
 	rm -f *~ *.bak *.lx *.a TAGS

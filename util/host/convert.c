@@ -200,8 +200,14 @@ int main(int argc, char **argv) {
     exit(1);
   }
   
-  image_load(img  , argv[optind++]);
-  image_load(img+1, argv[optind++]);
+  
+  printf("loading image from %s...\n", argv[optind]);
+  image_load(&img[0], argv[optind++]);
+
+  printf("loading image from %s...\n", argv[optind]);
+  image_load(&img[1], argv[optind++]);
+
+  printf("generating lx from images...\n");
   lx_from_images(&lx,img,stack_size);
     
   if(lx_write(&lx, argv[optind])) {

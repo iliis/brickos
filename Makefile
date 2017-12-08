@@ -249,8 +249,8 @@ clean::
 $(NATIVEOBJS): %.o: %.c
 	$(CC) -MMD $(CFLAGS) -c $< -o $@
 
-# how to build srec from coff (for download)
-%.srec: %.coff
-	$(CROSSOBJCOPY) -I elf32-h8300 -O srec $*.coff $*.srec
+# how to build srec from elf (for download)
+%.srec: %.elf
+	$(CROSSOBJCOPY) -I elf32-h8300 -O symbolsrec $*.elf $*.srec
 
 include Makefile.user

@@ -123,14 +123,14 @@ int lrkey_handler(unsigned int etype, unsigned int key);
 /*! allocates buffer, copies data and wakes parser task.
 */
 static void packet_producer(const unsigned char *data,
-			    unsigned char length, unsigned char src) {
+                unsigned char length, unsigned char src) {
     // old packet still unhandled or empty packet?
     //
     if(packet_len>0 || length==0)
-	return;
+    return;
     
     if (buffer_ptr != 0)
-	return;
+    return;
     
     buffer_ptr = malloc(length);
     memcpy(buffer_ptr,data,length);
@@ -164,10 +164,10 @@ int find_next_program() {
     int i;
     int next_prog = -1;
     for (i = cprog + 1; i < PROG_MAX; i++) {
-	if (program_valid(i)) {
-	    next_prog = i;
+    if (program_valid(i)) {
+        next_prog = i;
         break;
-	}
+    }
     }
     // handle wrap-around of program number
     if (-1 == next_prog) {
@@ -189,13 +189,13 @@ static void program_stop(void) {
     shutdown_tasks(T_USER);
     // Wait a bit
     while (--count_down && (nb_tasks > nb_system_tasks)) {
-	cputc_native_user(CHAR_S, CHAR_T, CHAR_O, CHAR_P);  // STOP
-	msleep(100);
+    cputc_native_user(CHAR_S, CHAR_T, CHAR_O, CHAR_P);  // STOP
+    msleep(100);
     }
     
     if (nb_tasks > nb_system_tasks) {
-	// Wait no longer.
-	killall(T_USER);
+    // Wait no longer.
+    killall(T_USER);
     }
 }
 
@@ -213,7 +213,7 @@ static void program_run(unsigned nr) {
     lnp_addressing_set_handler(0, LNP_DUMMY_ADDRESSING);
 
     execi((void*) (((char*)prog->text) + prog->start  ),
-	  0,0,prog->prio,prog->stack_size);
+      0,0,prog->prio,prog->stack_size);
 
     /* Wait for program to terminate */
     grab_kernel_lock();
@@ -221,22 +221,22 @@ static void program_run(unsigned nr) {
     add_to_waitqueue(&dkey_waitqueue, &dkey_entry);
     add_to_waitqueue(&synthetic_waitqueue, &synth_entry);
     while (!shutdown_requested() && nb_tasks > nb_system_tasks) {
-	if (synthetic_key) {
-	    if (synthetic_key == SYNTHKEY_STOP)
-		break;
-	    synthetic_key = 0;
-	}
-	if ((dkey & ~dkey_old & (KEY_RUN | KEY_ONOFF)) != 0)
-	    break;
-	dkey_old = dkey;
-	/* poll every 200 ms if program terminated. */
-	wait_timeout(200);
+    if (synthetic_key) {
+        if (synthetic_key == SYNTHKEY_STOP)
+        break;
+        synthetic_key = 0;
+    }
+    if ((dkey & ~dkey_old & (KEY_RUN | KEY_ONOFF)) != 0)
+        break;
+    dkey_old = dkey;
+    /* poll every 200 ms if program terminated. */
+    wait_timeout(200);
     }
     remove_from_waitqueue(&dkey_entry);
     remove_from_waitqueue(&synth_entry);
     if ((dkey & KEY_ONOFF) != 0) {
-	/* if ONOFF pressed, enqueue synthetic OFF key. */
-	synthetic_key = KEY_ONOFF;
+    /* if ONOFF pressed, enqueue synthetic OFF key. */
+    synthetic_key = KEY_ONOFF;
     }
     release_kernel_lock();
     program_stop();
@@ -284,121 +284,121 @@ __TEXT_HI__ static void answer_packet() {
     //
     cmd=buffer_ptr[0];
     if (cmd>=CMDlast || packet_len<min_length[cmd])
-	return;
+    return;
     
     // Get program number, validate value
     if((cmd > CMDacknowledge) && (cmd <= CMDrun)) {
-	nr = buffer_ptr[1];
-	if(nr > PROG_MAX)
-	    return;
-	debugw(nr);
-	prog = programs+nr;
+    nr = buffer_ptr[1];
+    if(nr > PROG_MAX)
+        return;
+    debugw(nr);
+    prog = programs+nr;
     }
-	
-	
+    
+    
     switch( cmd ) {
-	// handle IR CMDs
+    // handle IR CMDs
     case CMDirmode:
-	if (buffer_ptr[1]==0) {
-	    debugs("nearmodeIR");
-	    lnp_logical_range(0);
-	    debugs("OK");
-	    lnp_addressing_write(&acknowledge,1,packet_src,0);
-	} else {
-	    debugs("farmodeIR");
-	    lnp_logical_range(1);
-	    debugs("OK");
-	    lnp_addressing_write(&acknowledge,1,packet_src,0);
-	}
-	break;
-	       
+    if (buffer_ptr[1]==0) {
+        debugs("nearmodeIR");
+        lnp_logical_range(0);
+        debugs("OK");
+        lnp_addressing_write(&acknowledge,1,packet_src,0);
+    } else {
+        debugs("farmodeIR");
+        lnp_logical_range(1);
+        debugs("OK");
+        lnp_addressing_write(&acknowledge,1,packet_src,0);
+    }
+    break;
+           
     case CMDsethost:
-	// ACK before we change our address
-	lnp_addressing_write(&acknowledge,1,packet_src,0);
-	lnp_set_hostaddr(buffer_ptr[1]);
-	break;
+    // ACK before we change our address
+    lnp_addressing_write(&acknowledge,1,packet_src,0);
+    lnp_set_hostaddr(buffer_ptr[1]);
+    break;
   
     case CMDdelete:
-	debugs("dele");
-		
-	if(nb_tasks == nb_system_tasks) {
-	    if(prog->text)
-		free(prog->text);
-	    memset(prog,0,sizeof(program_t));
-		    
-	    if(nr == cprog)
+    debugs("dele");
+        
+    if(nb_tasks == nb_system_tasks) {
+        if(prog->text)
+        free(prog->text);
+        memset(prog,0,sizeof(program_t));
+            
+        if(nr == cprog)
             cputc_native_0(CHAR_DASH);
-	    debugs("OK");
-		    
-	    lnp_addressing_write(&acknowledge,1,packet_src,0);
-	}
-	break;
-		
+        debugs("OK");
+            
+        lnp_addressing_write(&acknowledge,1,packet_src,0);
+    }
+    break;
+        
     case CMDcreate:
-	debugs("crea");
-	if(!prog->text) {
-	    memcpy(&(prog->text_size),buffer_ptr+2,11);
-		    
-	    if((prog->text=malloc(prog->text_size+
-				  2*prog->data_size+
-				  prog->bss_size  ))) {
-		prog->data=prog->text+prog->text_size;
-		prog->bss=prog->data+prog->data_size;
-		prog->data_orig=prog->bss +prog->bss_size;
-		prog->downloaded=0;
-			
-		debugs("OK");
-			
-		cputw(prog->text_size + prog->data_size);
-		cprog = nr;
-			
-		msg[0]=CMDacknowledge;
-		msg[1]=nr;
-		memcpy(msg+2,prog,6);
-		lnp_addressing_write(msg,8,packet_src,0);
-	    } else
-		memset(prog,0,sizeof(program_t));
-	}
-	break;
-		
+    debugs("crea");
+    if(!prog->text) {
+        memcpy(&(prog->text_size),buffer_ptr+2,11);
+            
+        if((prog->text=malloc(prog->text_size+
+                  2*prog->data_size+
+                  prog->bss_size  ))) {
+        prog->data=prog->text+prog->text_size;
+        prog->bss=prog->data+prog->data_size;
+        prog->data_orig=prog->bss +prog->bss_size;
+        prog->downloaded=0;
+            
+        debugs("OK");
+            
+        cputw(prog->text_size + prog->data_size);
+        cprog = nr;
+            
+        msg[0]=CMDacknowledge;
+        msg[1]=nr;
+        memcpy(msg+2,prog,6);
+        lnp_addressing_write(msg,8,packet_src,0);
+        } else
+        memset(prog,0,sizeof(program_t));
+    }
+    break;
+        
     case CMDdata:
-	debugs("data");
-	if(prog->text) {
-	    size_t offset=*(size_t*)(buffer_ptr+2);
-	    if(offset<=prog->downloaded) {
-		if(offset==prog->downloaded) {
-		    memcpy(prog->text+offset,buffer_ptr+4,packet_len-4);
-		    prog->downloaded+=packet_len-4;
-			    
-		    if(program_valid(nr)) {
-			// copy original data segment and we're done.
-			//
-			memcpy(prog->data_orig,prog->data,prog->data_size);
-			cls();
-		    } else
-			cputw(prog->text_size + prog->data_size
-			      - prog->downloaded);
-		    debugs("OK");
-		} else
-		    debugs("OLD");
-	    }
-	    lnp_addressing_write(&acknowledge,1,packet_src,0);
-	}
-	break;
-		
+    debugs("data");
+    if(prog->text) {
+        size_t offset=*(size_t*)(buffer_ptr+2);
+        if(offset<=prog->downloaded) {
+        if(offset==prog->downloaded) {
+            memcpy(prog->text+offset,buffer_ptr+4,packet_len-4);
+            prog->downloaded+=packet_len-4;
+                
+            if(program_valid(nr)) {
+            // copy original data segment and we're done.
+            //
+            memcpy(prog->data_orig,prog->data,prog->data_size);
+            cls();
+            } else
+            cputw(prog->text_size + prog->data_size
+                  - prog->downloaded);
+            debugs("OK");
+        } else
+            debugs("OLD");
+        }
+        lnp_addressing_write(&acknowledge,1,packet_src,0);
+    }
+    break;
+        
     case CMDrun:
-	debugs("run");
-	if(program_valid(nr)) {
-	    cprog = nr;
-	    synthetic_key = SYNTHKEY_START;
-		    
-	    debugs("OK");
-	    lnp_addressing_write(&acknowledge,1,packet_src,0);
-	}
-	break;
-		
+    debugs("run");
+    if(program_valid(nr)) {
+        cprog = nr;
+        synthetic_key = SYNTHKEY_START;
+            
+        debugs("OK");
+        lnp_addressing_write(&acknowledge,1,packet_src,0);
+    }
+    break;
+        
     default:
-	debugs("error");
+    debugs("error");
     }
     packet_len=0;
     free(buffer_ptr);
@@ -422,19 +422,19 @@ static int program_event(void) {
     add_to_waitqueue(&dkey_waitqueue, &dkey_entry);
     add_to_waitqueue(&synthetic_waitqueue, &synth_entry);
     do {
-	dkey_old = dkey;
-	wait_timeout(1024);
+    dkey_old = dkey;
+    wait_timeout(1024);
 
-	result = dkey & ~dkey_old;
-	if (synthetic_key) {
-	  result = synthetic_key;
-	  synthetic_key = 0;
-	}
-	if (nb_tasks > nb_system_tasks)
-	    start_timer = (unsigned int) (get_system_up_time() >> 10L);
-	else if (((unsigned int)(get_system_up_time() >> 10L) - start_timer)
-	    >= DEFAULT_SHUTOFF_TIME && !result)
-	  result = KEY_ONOFF;
+    result = dkey & ~dkey_old;
+    if (synthetic_key) {
+      result = synthetic_key;
+      synthetic_key = 0;
+    }
+    if (nb_tasks > nb_system_tasks)
+        start_timer = (unsigned int) (get_system_up_time() >> 10L);
+    else if (((unsigned int)(get_system_up_time() >> 10L) - start_timer)
+        >= DEFAULT_SHUTOFF_TIME && !result)
+      result = KEY_ONOFF;
     } while (!result && !shutdown_requested());
     remove_from_waitqueue(&dkey_entry);
     remove_from_waitqueue(&synth_entry);
@@ -449,120 +449,120 @@ int program_main(int argc, void *argv[]) {
 
     show_program_num();
     while (!shutdown_requested()) {
-	int clear=0;
-	c=program_event();
-	
+    int clear=0;
+    c=program_event();
+    
 gotkey:
-	debugs("key "); debugw(c);
-	debugs("task"); debugw(nb_tasks);
-	
-	switch(c) {
-	case SYNTHKEY_PACKET:
-	    answer_packet();
-	    break;
+    debugs("key "); debugw(c);
+    debugs("task"); debugw(nb_tasks);
+    
+    switch(c) {
+        case SYNTHKEY_PACKET:
+            answer_packet();
+            break;
 
-	case KEY_RUN:
-	case SYNTHKEY_START:
-	    if (program_valid(cprog)) {
-		program_run(cprog);
-	    } else {
-            // show that the current program is invalid
-            cputc_native_user(CHAR_N, CHAR_O, CHAR_N, CHAR_E);  // NONE
-        }
-		clear = 1;
-	    break;
-
-	case KEY_ONOFF:
-	    // Kindly request all tasks shutdown
-	    shutdown_tasks(T_USER | T_KERNEL);
-	    // Except for ourself :)
-	    ctid->tflags &= (~T_SHUTDOWN);
-	    // Wait a bit until only idle task and we are running
-	    clear = 40;
-	    while (--clear && (nb_tasks > 2)) {
-        cputc_native_user(CHAR_O, CHAR_F, CHAR_F, 0);  // OFF
-		msleep(100);
-	    }
-	    clear = 0;
-	    // Wait no longer.
-	    if (nb_tasks > 2)
-		killall(T_USER | T_KERNEL);
-	    // Now we shutdown ourself.
-	    ctid->tflags |= T_SHUTDOWN;
-	    break;
-	    
-	case KEY_PRGM:
-        cprog = find_next_program();
-        show_program_num();
-        if (!program_valid(cprog)) {
-            cputc_native_user(CHAR_N, CHAR_O, CHAR_N, CHAR_E);  // NONE
+        case KEY_RUN:
+        case SYNTHKEY_START:
+            if (program_valid(cprog)) {
+                program_run(cprog);
+            } else {
+                // show that the current program is invalid
+                cputc_native_user(CHAR_N, CHAR_O, CHAR_N, CHAR_E);  // NONE
+            }
             clear = 1;
-        }
-	    break;
+            break;
+
+        case KEY_ONOFF:
+            // Kindly request all tasks shutdown
+            shutdown_tasks(T_USER | T_KERNEL);
+            // Except for ourself :)
+            ctid->tflags &= (~T_SHUTDOWN);
+            // Wait a bit until only idle task and we are running
+            clear = 40;
+            while (--clear && (nb_tasks > 2)) {
+                cputc_native_user(CHAR_O, CHAR_F, CHAR_F, 0);  // OFF
+                msleep(100);
+            }
+            clear = 0;
+            // Wait no longer.
+            if (nb_tasks > 2)
+                killall(T_USER | T_KERNEL);
+            // Now we shutdown ourself.
+            ctid->tflags |= T_SHUTDOWN;
+            break;
+
+        case KEY_PRGM:
+            cprog = find_next_program();
+            show_program_num();
+            if (!program_valid(cprog)) {
+                cputc_native_user(CHAR_N, CHAR_O, CHAR_N, CHAR_E);  // NONE
+                clear = 1;
+            }
+            break;
 
 #ifdef CONF_VIEW_BUTTON
-	case KEY_VIEW:
-	    /*
-	     * pressing the "view" button cycles through a display of the
-	     * amount of the amount of free memory (in decimal and
-	     * hexadecimal) and battery power. If a button other than "view"
-	     * is pressed while cycling through, we handle that button
-	     * ("goto gotkey").
-	     */
-        cputc_native_user(CHAR_A, CHAR_d, CHAR_r, 0); // Adr
-	    cputc_hex(lnp_hostaddr >> 4, 1);
-	    while ((c = program_event()) == KEY_PRGM) {
-		lnp_hostaddr += 0x10;
-		cputc_hex(lnp_hostaddr >> 4, 1);
-	    }
-	    if (c != KEY_VIEW) goto gotkey;
+        case KEY_VIEW:
+            /*
+             * pressing the "view" button cycles through a display of the
+             * amount of the amount of free memory (in decimal and
+             * hexadecimal) and battery power. If a button other than "view"
+             * is pressed while cycling through, we handle that button
+             * ("goto gotkey").
+             */
+            cputc_native_user(CHAR_A, CHAR_d, CHAR_r, 0); // Adr
+            cputc_hex(lnp_hostaddr >> 4, 1);
+            while ((c = program_event()) == KEY_PRGM) {
+                lnp_hostaddr += 0x10;
+                cputc_hex(lnp_hostaddr >> 4, 1);
+            }
+            if (c != KEY_VIEW) goto gotkey;
 
-	    for(;;) {
-		lcd_number(((mm_free_mem()>>7)*100)>>3, unsign, e_2);
-		cputc_native_1(CHAR_F);
-		c = program_event();
-		    
-		if (c == KEY_VIEW)
-		    break;
+            for(;;) {
+                lcd_number(((mm_free_mem()>>7)*100)>>3, unsign, e_2);
+                cputc_native_1(CHAR_F);
+                c = program_event();
 
-		if (c != KEY_PRGM) 
-		    goto gotkey;
+                if (c == KEY_VIEW)
+                    break;
 
-		if (program_valid(cprog)) {
-            cputc_native_user(CHAR_d, CHAR_e, CHAR_l, CHAR_QUESTION); // del?
-		    c = program_event();
-		    if (c == KEY_PRGM) {
-			grab_kernel_lock();
-			program_t *prog = programs+cprog;
-			if (prog->text)
-			    free(prog->text);
-			memset(prog,0,sizeof(program_t));
-			cprog = find_next_program();
-            show_program_num();
-			release_kernel_lock();
-		    } else if (c != KEY_VIEW);
-			goto gotkey;
-		}
-	    }
+                if (c != KEY_PRGM) 
+                    goto gotkey;
+
+                if (program_valid(cprog)) {
+                    cputc_native_user(CHAR_d, CHAR_e, CHAR_l, CHAR_QUESTION); // del?
+                    c = program_event();
+                    if (c == KEY_PRGM) {
+                        grab_kernel_lock();
+                        program_t *prog = programs+cprog;
+                        if (prog->text)
+                            free(prog->text);
+                        memset(prog,0,sizeof(program_t));
+                        cprog = find_next_program();
+                        show_program_num();
+                        release_kernel_lock();
+                    } else if (c != KEY_VIEW)
+                        goto gotkey;
+                }
+            }
 
 #if defined(CONF_DSENSOR)
-	    lcd_number(get_battery_mv(), unsign, e_3);
-	    if ((c = program_event()) != KEY_VIEW) goto gotkey;
+            lcd_number(get_battery_mv(), unsign, e_3);
+            if ((c = program_event()) != KEY_VIEW) goto gotkey;
 #endif // CONF_DSENSOR
-	    
-	    clear=1;
-	    break;
+
+            clear=1;
+            break;
 #endif // CONF_VIEW_BUTTON
-    // Reset the shutoff timer
-    //case SYNTHKEY_RESET_SHUTOFF_TIMER:
-        // Nothing to do
-        //break;
-	}
-	
-	if(clear) {
-	    dkey_wait(KEY_RELEASED, KEY_ANY);
-	    cls();
-	}
+            // Reset the shutoff timer
+            //case SYNTHKEY_RESET_SHUTOFF_TIMER:
+            // Nothing to do
+            //break;
+    }
+    
+    if(clear) {
+        dkey_wait(KEY_RELEASED, KEY_ANY);
+        cls();
+    }
     }
     return 0;
 }
@@ -610,8 +610,8 @@ __TEXT_HI__ int lrkey_handler(unsigned int etype, unsigned int key) {
           if(program_valid(pnr)) 
           {
             // launch Program(n)
-	    synthetic_key = SYNTHKEY_START;
-	    wakeup(synthetic_waitqueue);
+        synthetic_key = SYNTHKEY_START;
+        wakeup(synthetic_waitqueue);
           } else {
             cputc_native_user(CHAR_N, CHAR_O, CHAR_N, CHAR_E);  // NONE
           }
@@ -717,8 +717,8 @@ __TEXT_HI__ void program_init() {
 __TEXT_HI__ void program_shutdown() {
     lnp_addressing_set_handler(0, LNP_DUMMY_ADDRESSING);
     if (buffer_ptr) {
-	free(buffer_ptr);
-	buffer_ptr = 0;
+    free(buffer_ptr);
+    buffer_ptr = 0;
     }
 
 #ifdef CONF_LR_HANDLER

@@ -14,7 +14,7 @@ KSOURCES=$(KSOURCES1:%=kernel/%)
 KASMSOURCES1=dccasm.S
 KASMSOURCES=$(KASMSOURCES1:%=kernel/%)
 
-KERNEL_TARGETS:=$(KERNEL).coff $(KERNEL).srec $(KERNEL).lds
+KERNEL_TARGETS:=$(KERNEL).elf $(KERNEL).srec $(KERNEL).lds
 
 # Files of the source distribution
 DISTFILES += kernel/Makefile.sub $(KSOURCES) $(KASMSOURCES)
@@ -32,10 +32,10 @@ install:: $(KERNEL_TARGETS)
 	install -m 644 $(KERNEL_TARGETS) $(DESTDIR)$(pkgdatadir)
 
 clean::
-	rm -f kernel/*.srec kernel/*.o kernel/*.lds kernel/*.dis kernel/*.coff kernel/*.map kernel/*.d
+	rm -f kernel/*.srec kernel/*.o kernel/*.lds kernel/*.dis kernel/*.coff kernel/*.map kernel/*.d kernel/*.delf
 
 realclean::
-	rm -rf kernel/*~ kernel/*.bak kernel/*.tgz kernel/*.s kernel/tags kernel/*.dcoff kernel/*.dmap kernel/*.dsrec
+	rm -rf kernel/*~ kernel/*.bak kernel/*.tgz kernel/*.s kernel/tags kernel/*.dcoff kernel/*.dmap kernel/*.dsrec kernel/*.delf
 	rm -f  kernel/*.srec kernel/install-stamp
 
 .PHONY: all tag clean realclean depend
@@ -63,12 +63,12 @@ GET_BASE_FROM_FILE2 = $(shell [ -e $(2) ] && cat $(2) | grep -E ^$(1)[[:space:]]
 ############ kernel stuff
 
 # how to build coff kernel (for symbols, disassembly etc)
-$(KERNEL).coff: $(KOBJECTS) $(KLIBRARIES)
+$(KERNEL).elf: $(KOBJECTS) $(KLIBRARIES)
 	$(CROSSLD) $(KLDFLAGS) $(KOBJECTS) $(KLIBS) -o $@
 
 # how to make kernel lds files
-%.lds: %.coff $(GENLDS)
-	$(CROSSNM) $*.coff | sort -u | $(GENLDS) $* > $*.lds
+%.lds: %.elf $(GENLDS)
+	$(CROSSNM) $*.elf | sort -u | $(GENLDS) $* > $*.lds
 
 # Update the BASE1 and BASE2 addresses in Makefile.user only if there has been a change
 BaseAddresses: $(KERNEL).lds

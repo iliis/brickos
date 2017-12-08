@@ -7,6 +7,7 @@
  */
 
 OUTPUT_FORMAT("elf32-h8300")
+/*OUTPUT_FORMAT("symbolsrec")*/
 OUTPUT_ARCH(h8300)
 ENTRY("_kmain")
 
@@ -58,7 +59,9 @@ SECTIONS {
     ___text = . ;
     *(.text.ma)       /* must start with text.ma for clean entry */
     *(.text) 	 
+    *(.text.startup)
     *(.rodata)
+    *(.rodata.str1.1)
     *(.strings)
     *(.vectors)       /* vectors region (dummy) */
     ___text_end = . ;

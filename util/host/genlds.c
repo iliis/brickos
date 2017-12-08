@@ -27,8 +27,8 @@
 #include <time.h>
 #include <string.h>
 
-#define MAX_SYMBOLS 65536		//!< max symbols, enough for the RCX
-#define MAX_SYMLEN  256			//!< max symbol length. 
+#define MAX_SYMBOLS 65536       //!< max symbols, enough for the RCX
+#define MAX_SYMLEN  256         //!< max symbol length. 
 
 #define BASE2_OFFSET 0x0210
 
@@ -43,43 +43,45 @@ symbol_t symbols[MAX_SYMBOLS];
 
 //! read the kernel symbols from a file
 static unsigned read_symbols(FILE *f,symbol_t *symbols,unsigned max,unsigned *ram) {
-  char buffer[MAX_SYMLEN];
-  unsigned i=0;
-  *ram = 0;
-  
-  for(; i<max; ) {
-    char symtype;
-    
-    if(!fgets(buffer,MAX_SYMLEN,f))
-      break;
-    
-    buffer[MAX_SYMLEN-1]=0;
-    sscanf(buffer,"%x %c %s",&(symbols[i].addr),&symtype,symbols[i].text);
+    char buffer[MAX_SYMLEN];
+    unsigned i=0;
+    *ram = 0;
 
-    // keep global symbols
-    //
-    if(symtype=='T' || symtype=='D' || symtype=='B') {
-      // check for start of user RAM
-      //
-      if(!strcmp(symbols[i].text,"_mm_start"))
-        *ram=symbols[i].addr+2;
-      
-      // skip special symbols
-      //
-      if(!strcmp(symbols[i].text,"_main"))
-	continue;
-      if(!strncmp(symbols[i].text,"___text",7))
-	continue;
-      if(!strncmp(symbols[i].text,"___data",7))
-	continue;
-      if(!strncmp(symbols[i].text,"___bss" ,6))
-	continue;
-      
-      i++;
+    for(; i<max; ) {
+        char symtype;
+
+        if(!fgets(buffer,MAX_SYMLEN,f))
+            break;
+
+        buffer[MAX_SYMLEN-1]=0;
+        sscanf(buffer,"%x %c %s",&(symbols[i].addr),&symtype,symbols[i].text);
+
+        // keep global symbols
+        //
+        if(symtype=='T' || symtype=='D' || symtype=='B') {
+            // check for start of user RAM
+            //
+            if(!strcmp(symbols[i].text,"_mm_start"))
+                *ram=symbols[i].addr+2;
+
+            // skip special symbols
+            //
+            if(!strcmp(symbols[i].text,"_main"))
+                continue;
+            if(!strncmp(symbols[i].text,"___text",7))
+                continue;
+            if(!strncmp(symbols[i].text,"___data",7))
+                continue;
+            if(!strncmp(symbols[i].text,"___bss" ,6))
+                continue;
+
+            //printf("read symbol: '%s' at %x\n", symbols[i].text, symbols[i].addr);
+
+            i++;
+        }
     }
-  }
-  
-  return i;
+
+    return i;
 }
 
 
@@ -93,8 +95,8 @@ static void print_symbols(FILE *f,symbol_t *symbols,unsigned num_symbols) {
 
 //! print the linker script header.
 static void print_header(FILE *f,
-		         const char *now,const char *kernel_name,
-			 unsigned ram,unsigned kernlen, unsigned ramlen) {
+                 const char *now,const char *kernel_name,
+             unsigned ram,unsigned kernlen, unsigned ramlen) {
     fprintf(f,
 "/*\n\
  * \n\
@@ -153,7 +155,7 @@ SECTIONS {\n\
     \n\
   } > rom\n\
 \n\
-  .kernel :	{\n\
+  .kernel : {\n\
     /* kernel symbols (relative to 0x8000) */\n\
 ",
     now, kernel_name, ram, BASE2_OFFSET, ram, ram + BASE2_OFFSET,
@@ -167,10 +169,12 @@ static void print_footer(FILE *f) {
 "    /* end of kernel symbols */\n\
   }  > kern\n\
       \n\
-  .text BLOCK(2) :	{\n\
+  .text BLOCK(2) :  {\n\
     ___text = . ;\n\
-    *(.text) 	      /* must start with text for clean entry */			\n\
+    *(.text)          /* must start with text for clean entry */            \n\
+    *(.text.startup)\n\
     *(.rodata)\n\
+    *(.rodata.str1.1)\n\
     *(.strings)\n\
     *(.vectors)       /* vectors region (dummy) */\n\
     *(.persist)\n\
